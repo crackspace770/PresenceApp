@@ -1,41 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        app:elevation="0dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/tvTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </RelativeLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -44,17 +14,24 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvAttendance"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
+                app:cardElevation="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -80,7 +57,7 @@
                             android:layout_gravity="center"
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"
-                            android:text="Absen harus Foto Selfie ya!"
+                            android:text="You can only fill in once"
                             android:textColor="@color/white"
                             android:textSize="18sp" />
 
@@ -223,13 +200,14 @@
                         <EditText
                             android:id="@+id/inputLokasi"
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
+                            android:layout_height="wrap_content"
                             android:backgroundTint="@color/blue"
-                            android:focusableInTouchMode="false"
+                            android:gravity="start|top"
                             android:hint="Masukan lokasi"
                             android:imeOptions="actionNext"
-                            android:lineSpacingExtra="20sp"
-                            android:maxLines="1"
+                            android:inputType="textMultiLine"
+                            android:maxLines="5"
+                            android:minLines="1"
                             android:textSize="16sp" />
 
                     </LinearLayout>
@@ -243,45 +221,82 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Keterangan"
+                            android:text="Status"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/spinnerStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:backgroundTint="@color/blue"
+                            android:prompt="@string/choose_status"
+                            android:textSize="16sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="20dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Keterangan(Jika ada)"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <EditText
                             android:id="@+id/inputKeterangan"
                             android:layout_width="match_parent"
-                            android:layout_height="50dp"
+                            android:layout_height="wrap_content"
                             android:backgroundTint="@color/blue"
-                            android:hint="Masukan Keterangan"
-                            android:imeOptions="actionDone"
-                            android:maxLines="1"
-                            android:singleLine="true"
+                            android:gravity="start|top"
+                            android:hint="Masukan lokasi"
+                            android:imeOptions="actionNext"
+                            android:inputType="textMultiLine"
+                            android:maxLines="5"
+                            android:minLines="1"
                             android:textSize="16sp" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
+
             </androidx.cardview.widget.CardView>
+
+            <ProgressBar
+                android:id="@+id/progressbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="invisible"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAbsen"
                 style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="match_parent"
+                android:layout_width="340dp"
                 android:layout_height="60dp"
                 android:layout_gravity="bottom"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginEnd="40dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="16dp"
                 android:backgroundTint="@color/blue"
                 android:text="Masuk"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 app:cornerRadius="20dp"
-                app:elevation="5dp" />
+                app:elevation="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cvAttendance" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.core.widget.NestedScrollView>
 
@@ -302,5 +317,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -10,17 +10,31 @@
         android:name="com.fajar.absensi.ui.main.MainFragment"
         android:label="MainFragment"
         tools:layout="@layout/fragment_main"
-        />
-    <fragment
-        android:id="@+id/historyFragment"
-        android:name="com.fajar.absensi.ui.history.HistoryFragment"
-        android:label="HistoryFragment"
-        tools:layout="@layout/fragment_history"
-        />
+        >
+        <action
+            android:id="@+id/action_mainFragment_to_detailPresenceFragment"
+            app:destination="@id/detailPresenceFragment" />
+    </fragment>
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.fajar.absensi.ui.profile.ProfileFragment"
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile"
         />
+    <fragment
+        android:id="@+id/presenceFragment"
+        android:name="com.fajar.absensi.ui.absen.PresenceFragment"
+        android:label="PresenceFragment"
+        tools:layout="@layout/fragment_presence"
+        />
+    <fragment
+        android:id="@+id/detailPresenceFragment"
+        android:name="com.fajar.absensi.ui.absen.DetailPresenceFragment"
+        android:label="DetailPresenceFragment"
+        tools:layout="@layout/fragment_presence_detail"
+        >
+        <argument
+            android:name="presence"
+            app:argType="com.fajar.absensi.model.Presensi" />
+    </fragment>
 </navigation>

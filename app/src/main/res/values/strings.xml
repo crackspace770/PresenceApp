@@ -22,7 +22,10 @@
     <string name="transaction_title">Transaction</string>
     <string name="history_title">Order</string>
     <string name="item_title">Item</string>
+    <string name="presence_title">Presence</string>
     <string name="status">Status</string>
+
+    <string name="choose_status">Choose Status</string>
 
     <string name="password_error">Kata sandi kurang dari 6 karakter</string>
 

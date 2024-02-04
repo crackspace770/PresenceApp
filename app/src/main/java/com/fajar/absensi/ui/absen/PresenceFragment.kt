@@ -16,18 +16,21 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.DatePicker
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.fajar.absensi.R
-import com.fajar.absensi.databinding.ActivityAbsenBinding
+import com.fajar.absensi.databinding.FragmentPresenceBinding
 import com.fajar.absensi.model.Presensi
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -48,11 +51,11 @@ import java.util.Locale
 import java.util.UUID
 
 @AndroidEntryPoint
-class AbsenActivity:AppCompatActivity() {
+class PresenceFragment:Fragment() {
+
+    private lateinit var binding: FragmentPresenceBinding
 
     private lateinit var mBitmap: Bitmap
-    private lateinit var binding: ActivityAbsenBinding
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private val firestore = Firebase.firestore
@@ -60,11 +63,8 @@ class AbsenActivity:AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    private lateinit var successView: View
-    private lateinit var errorView:View
-    private lateinit var successButton: Button
-    private lateinit var errorButton:Button
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -76,16 +76,22 @@ class AbsenActivity:AppCompatActivity() {
                 // Permission granted, launch the camera
                 setCamera()
             } else {
-                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentPresenceBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityAbsenBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         auth = Firebase.auth
         db = FirebaseFirestore.getInstance()
@@ -95,7 +101,7 @@ class AbsenActivity:AppCompatActivity() {
         setUploadData()
         retrieveData()
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         binding.apply {
             imageSelfie.setOnClickListener {
@@ -112,20 +118,33 @@ class AbsenActivity:AppCompatActivity() {
 
         }
 
-        successView = findViewById(R.id.view_success)
-        errorView = findViewById(R.id.view_error)
+        // Define your status choices
+        val statusChoices = arrayOf("Check In", "Check Out", "Izin") // Replace with your actual choices
+
+        // Find the spinner in your layout
+        val spinnerStatus: Spinner = view.findViewById(R.id.spinnerStatus)
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statusChoices)
+
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // Apply the adapter to the spinner
+        spinnerStatus.adapter = adapter
+
 
     }
 
     private fun setCamera() {
         if (ContextCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 Manifest.permission.CAMERA
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             // Request the CAMERA permission
             ActivityCompat.requestPermissions(
-                this,
+                requireActivity(),
                 arrayOf(Manifest.permission.CAMERA),
                 100
             )
@@ -157,13 +176,13 @@ class AbsenActivity:AppCompatActivity() {
 
     private fun setCurrentLocation() {
         if (ContextCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             // Request the LOCATION permission
             ActivityCompat.requestPermissions(
-                this,
+                requireActivity(),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 101
             )
@@ -175,11 +194,11 @@ class AbsenActivity:AppCompatActivity() {
 
     private fun getLocation() {
         if (ContextCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val criteria = Criteria()
             val provider: String? = locationManager.getBestProvider(criteria, true)
 
@@ -191,7 +210,7 @@ class AbsenActivity:AppCompatActivity() {
                         val longitude = location.longitude
 
                         // Use Geocoder to get address details
-                        val geocoder = Geocoder(this, Locale.getDefault())
+                        val geocoder = Geocoder(requireContext(), Locale.getDefault())
                         val addresses: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
 
                         if (addresses != null) {
@@ -208,23 +227,23 @@ class AbsenActivity:AppCompatActivity() {
                                 // Update your UI or set the location to the inputLokasi text field
                                 binding.inputLokasi.setText(locationString)
                             } else {
-                                Toast.makeText(this, "Address not found", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "Address not found", Toast.LENGTH_SHORT).show()
                             }
                         }
                     } else {
-                        Toast.makeText(this, "Unable to get current location", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Unable to get current location", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: SecurityException) {
                     e.printStackTrace()
-                    Toast.makeText(this, "SecurityException: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "SecurityException: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Location provider not available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Location provider not available", Toast.LENGTH_SHORT).show()
             }
         } else {
             // Request the LOCATION permission if not granted
             ActivityCompat.requestPermissions(
-                this,
+                requireActivity(),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 101
             )
@@ -244,7 +263,7 @@ class AbsenActivity:AppCompatActivity() {
                 binding.inputTanggal.setText(simpleDateFormat.format(tanggalAbsen.time))
             }
         DatePickerDialog(
-            this@AbsenActivity, date,
+            requireContext(), date,
             tanggalAbsen[Calendar.YEAR],
             tanggalAbsen[Calendar.MONTH],
             tanggalAbsen[Calendar.DAY_OF_MONTH]
@@ -260,10 +279,19 @@ class AbsenActivity:AppCompatActivity() {
         }
     }
 
+    private fun hideLoading() {
+        binding.progressbar.visibility = View.INVISIBLE
+    }
+
+    private fun showLoading() {
+        binding.progressbar.visibility = View.VISIBLE
+
+    }
+
     private fun uploadData(state: (Boolean) -> Unit) {
         val name = binding.inputNama.text.toString().trim()
         val idPegawai = binding.inputIdPegawai.text.toString().trim()
-        val selfieImageUri: Uri? = getImageUriFromImageView(binding.imageSelfie)  // Helper function to get Uri from ImageView
+        val selfieImageUri: Uri? = getImageUriFromImageView(binding.imageSelfie)
         val tanggal = binding.inputTanggal.text.toString().trim()
         val lokasi = binding.inputLokasi.text.toString().trim()
         val keterangan = binding.inputKeterangan.text.toString().trim()
@@ -271,13 +299,15 @@ class AbsenActivity:AppCompatActivity() {
 
         if (userId != null) {
             lifecycleScope.launch {
+                showLoading()
                 try {
                     val id = UUID.randomUUID().toString()
 
                     // Upload selfie image to Firebase Storage
                     val storageRef = storage.child("presensi/selfie/$id.jpg")
                     storageRef.putFile(selfieImageUri!!)
-                        .addOnSuccessListener {
+                        .addOnSuccessListener { taskSnapshot ->
+
                             // Get download URL of the uploaded image
                             storageRef.downloadUrl.addOnSuccessListener { uri ->
                                 val photoUrl = uri.toString()
@@ -287,17 +317,21 @@ class AbsenActivity:AppCompatActivity() {
                                         val employeeName = userSnapshot.getString("name")
                                         val employeeId = userId
 
+                                        // Retrieve the selected status from the Spinner
+                                        val selectedStatus = binding.spinnerStatus.selectedItem.toString()
+
                                         // Create a product object
                                         val product = Presensi(
                                             id,
                                             name,
                                             idPegawai,
-                                            photoUrl,  // Use the download URL of the image
+                                            photoUrl,
                                             tanggal,
                                             lokasi,
                                             keterangan,
                                             employeeName,
-                                            employeeId
+                                            employeeId,
+                                            selectedStatus  // Include the selected status in the document
                                         )
 
                                         // Upload product data to the subcollection "presensi" under the "user" collection
@@ -305,18 +339,20 @@ class AbsenActivity:AppCompatActivity() {
                                             .collection("presensi").document(id)
                                             .set(product)
                                             .addOnSuccessListener {
-                                                successView.visibility = View.VISIBLE
-                                                successButton.setOnClickListener {
-                                                    finish()
+                                                binding.viewSuccess.root.visibility = View.VISIBLE
+                                                binding.viewSuccess.imgCloseSuccess.setOnClickListener {
+                                                    binding.viewSuccess.root.visibility = View.GONE
                                                 }
+                                                hideLoading()
                                                 state(true)
                                             }
                                             .addOnFailureListener { exception ->
                                                 Log.e("Firestore", "Error adding document to subcollection: $exception")
-                                                errorView.visibility = View.VISIBLE
-                                                errorButton.setOnClickListener {
-                                                    finish()
+                                                binding.viewError.root.visibility = View.VISIBLE
+                                                binding.viewError.imgCloseFail.setOnClickListener {
+                                                    binding.viewError.root.visibility = View.GONE
                                                 }
+                                                hideLoading()
                                                 state(false)
                                             }
                                     }
@@ -324,16 +360,19 @@ class AbsenActivity:AppCompatActivity() {
                         }
                         .addOnFailureListener { exception ->
                             Log.e("Firebase Storage", "Error uploading selfie image: $exception")
+                            hideLoading()
                             state(false)
                         }
 
                 } catch (e: Exception) {
+                    hideLoading()
                     state(false)
                     return@launch
                 }
             }
         } else {
             state(false)
+            hideLoading()
             Log.e("Firestore", "User ID null")
         }
     }
@@ -364,7 +403,7 @@ class AbsenActivity:AppCompatActivity() {
             binding.imageSelfie.setImageURI(data?.data)
 
             val uri : Uri?= data?.data
-            mBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+            mBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
         }
         else if(requestCode == 200 && resultCode == Activity.RESULT_OK){
             mBitmap = data?.extras?.get("data") as Bitmap
@@ -374,12 +413,15 @@ class AbsenActivity:AppCompatActivity() {
     }
 
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            finish()
+
             return true
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 
 }

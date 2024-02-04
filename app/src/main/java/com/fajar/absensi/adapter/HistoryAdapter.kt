@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.fajar.absensi.databinding.ItemListHistoryBinding
 import com.fajar.absensi.model.Presensi
 
@@ -14,12 +13,10 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() 
     inner class HistoryViewHolder(private val binding: ItemListHistoryBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(presensi: Presensi) {
             binding.apply {
-                tvNama.text = presensi.name
-                tvNomor.text = presensi.idPegawai
-                tvAbsenTime.text = presensi.tanggal
-                tvLokasi.text = presensi.lokasi
+                tvNamaAbsen.text = presensi.name
+                tvTanggalAbsen.text = presensi.tanggal
+                tvLokasiAbsen.text = presensi.lokasi
                 tvStatusAbsen.text = presensi.keterangan
-                Glide.with(itemView).load(presensi.fotoSelfie).into(imageProfile)
             }
         }
     }
@@ -51,14 +48,20 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() 
     }
 
     override fun onBindViewHolder(holder: HistoryAdapter.HistoryViewHolder, position: Int) {
-        val order = differ.currentList[position]
-        holder.bind(order)
+        val presence = differ.currentList[position]
+        holder.bind(presence)
+
+        holder.itemView.setOnClickListener {
+            onClick?.invoke(presence)
+        }
 
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
+
+    var onClick: ((Presensi) -> Unit)? = null
 
 
 }

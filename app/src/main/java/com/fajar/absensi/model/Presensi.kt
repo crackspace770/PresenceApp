@@ -11,11 +11,12 @@ data class Presensi(
     val fotoSelfie:String? = null,
     val tanggal: String? = null,
     val lokasi:String? = null,
+    val status:String? = null,
     val keterangan: String? = null,
     val employeeName: String? = null,
     val employeeId: String? = null,
 
 ): Parcelable {
     // Add a default no-argument constructor
-    constructor() : this("", "", "", "", "", "", "", "","")
+    constructor() : this("", "", "","", "", "", "", "", "","")
 }
